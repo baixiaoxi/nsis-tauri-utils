@@ -211,7 +211,7 @@ macro_rules! nsis_plugin {
             true
         }
 
-        #[cfg(not(test))]
+        #[cfg(all(panic = "abort", not(test)))]
         #[panic_handler]
         fn panic(_info: &core::panic::PanicInfo) -> ! {
             unsafe { ::windows_sys::Win32::System::Threading::ExitProcess(u32::MAX) }

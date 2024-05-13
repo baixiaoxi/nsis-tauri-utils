@@ -30,7 +30,7 @@ pub fn nsis_fn(_attr: TokenStream, tokens: TokenStream) -> TokenStream {
 
     quote! {
         #[inline(always)]
-        pub unsafe fn #new_ident() -> Result<(), ::nsis_plugin_api::Error> #block
+        pub unsafe fn #new_ident(hwnd_parent: ::windows_sys::Win32::Foundation::HWND) -> Result<(), ::nsis_plugin_api::Error> #block
 
         #(#attrs)*
         #[no_mangle]
@@ -42,7 +42,7 @@ pub fn nsis_fn(_attr: TokenStream, tokens: TokenStream) -> TokenStream {
             stacktop: *mut *mut ::nsis_plugin_api::stack_t,
         ) {
             ::nsis_plugin_api::exdll_init(string_size, variables, stacktop);
-            if let Err(e) = #new_ident() {
+            if let Err(e) = #new_ident(hwnd_parent) {
                 e.push_err();
             }
         }
