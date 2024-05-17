@@ -30,7 +30,7 @@ pub fn nsis_fn(_attr: TokenStream, tokens: TokenStream) -> TokenStream {
 
     quote! {
         #[inline(always)]
-        pub unsafe fn #new_ident(hwnd_parent: ::windows_sys::Win32::Foundation::HWND) -> Result<(), ::nsis_plugin_api::Error> #block
+        pub unsafe fn #new_ident(hwnd_parent: ::windows_sys::Win32::Foundation::HWND, extra: *mut ::nsis_plugin_api::ExtraParameters) -> Result<(), ::nsis_plugin_api::Error> #block
 
         #(#attrs)*
         #[no_mangle]
@@ -40,9 +40,10 @@ pub fn nsis_fn(_attr: TokenStream, tokens: TokenStream) -> TokenStream {
             string_size: core::ffi::c_int,
             variables: *mut ::nsis_plugin_api::wchar_t,
             stacktop: *mut *mut ::nsis_plugin_api::stack_t,
+            extra: *mut ::nsis_plugin_api::ExtraParameters,
         ) {
             ::nsis_plugin_api::exdll_init(string_size, variables, stacktop);
-            if let Err(e) = #new_ident(hwnd_parent) {
+            if let Err(e) = #new_ident(hwnd_parent, extra) {
                 e.push_err();
             }
         }

@@ -19,7 +19,7 @@ use alloc::{
 };
 
 use windows_sys::Win32::{
-    Foundation::GlobalFree,
+    Foundation::{GlobalFree, HMODULE, HWND},
     Globalization::{lstrcpyW, lstrcpynW},
     System::Memory::{
         GetProcessHeap, GlobalAlloc, HeapAlloc, HeapFree, HeapReAlloc, GPTR, HEAP_ZERO_MEMORY,
@@ -35,6 +35,41 @@ pub type wchar_t = i32;
 pub struct stack_t {
     pub next: *mut stack_t,
     pub text: [wchar_t; 1],
+}
+
+enum NSPIM {
+    NSPIM_UNLOAD,    // This is the last message a plugin gets, do final cleanup
+    NSPIM_GUIUNLOAD, // Called after .onGUIEnd
+}
+
+type NSISPLUGINCALLBACK = Option<fn(NSPIM) -> usize>;
+
+#[repr(C)]
+#[derive(Debug)]
+pub struct exec_flags_t {
+    pub autoclose: i32,
+    pub all_user_var: i32,
+    pub exec_error: i32,
+    pub abort: i32,
+    pub exec_reboot: i32,
+    pub reboot_called: i32,
+    pub XXX_cur_insttype: i32,
+    pub plugin_api_version: i32,
+    pub silent: i32,
+    pub instdir_error: i32,
+    pub rtl: i32,
+    pub errlvl: i32,
+    pub alter_reg_view: i32,
+    pub status_update: i32,
+}
+
+#[repr(C)]
+#[derive(Debug)]
+pub struct ExtraParameters {
+    pub exec_flags: *mut exec_flags_t,
+    pub ExecuteCodeSegment: Option<unsafe extern "system" fn(isize, HWND) -> isize>,
+    pub validate_filename: Option<unsafe extern "system" fn(*mut wchar_t)>,
+    pub RegisterPluginCallback: Option<unsafe extern "system" fn(HMODULE, NSISPLUGINCALLBACK)>
 }
 
 pub static mut G_STRINGSIZE: c_int = 0;
