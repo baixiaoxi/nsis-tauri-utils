@@ -67,7 +67,7 @@ pub struct exec_flags_t {
 #[derive(Debug)]
 pub struct ExtraParameters {
     pub exec_flags: *mut exec_flags_t,
-    pub ExecuteCodeSegment: Option<unsafe extern "system" fn(isize, HWND) -> isize>,
+    pub ExecuteCodeSegment: Option<unsafe extern "system" fn(c_int, HWND) -> c_int>,
     pub validate_filename: Option<unsafe extern "system" fn(*mut wchar_t)>,
     pub RegisterPluginCallback: Option<unsafe extern "system" fn(HMODULE, NSISPLUGINCALLBACK)>
 }
