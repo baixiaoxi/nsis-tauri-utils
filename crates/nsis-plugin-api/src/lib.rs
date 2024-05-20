@@ -37,7 +37,9 @@ pub struct stack_t {
     pub text: [wchar_t; 1],
 }
 
-enum NSPIM {
+#[repr(C)]
+#[derive(Debug)]
+pub enum NSPIM {
     NSPIM_UNLOAD,    // This is the last message a plugin gets, do final cleanup
     NSPIM_GUIUNLOAD, // Called after .onGUIEnd
 }
@@ -237,6 +239,7 @@ unsafe impl GlobalAlloc for Heapalloc {
 #[macro_export]
 macro_rules! nsis_plugin {
     () => {
+        #[cfg(not(feature = "custom_dll_main"))]
         #[no_mangle]
         extern "system" fn DllMain(
             dll_module: ::windows_sys::Win32::Foundation::HINSTANCE,
@@ -246,7 +249,7 @@ macro_rules! nsis_plugin {
             true
         }
 
-        #[cfg(all(panic = "abort", not(test)))]
+        #[cfg(all(not(feature = "custom_panic"), not(test)))]
         #[panic_handler]
         fn panic(_info: &core::panic::PanicInfo) -> ! {
             unsafe { ::windows_sys::Win32::System::Threading::ExitProcess(u32::MAX) }

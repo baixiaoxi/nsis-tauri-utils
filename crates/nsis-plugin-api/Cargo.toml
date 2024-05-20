@@ -7,3 +7,7 @@ license = "MIT OR Apache-2.0"
 [dependencies]
 windows-sys = { workspace = true }
 nsis-fn = { path = "../nsis-fn" }
+
+[features]
+custom_dll_main = []
+custom_panic = []
